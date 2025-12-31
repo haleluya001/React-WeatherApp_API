@@ -28,9 +28,11 @@ function App() {
       ).getHours()
     : new Date().getHours();
 
-  const GradientClass = getGradientClass(hour);
+  const gradientClass = getGradientClass(hour);
 
   useEffect(() => {
+    let intervalId;
+
     const fetchWeather = async () => {
       setLoading(true);
       setError('');
@@ -38,7 +40,6 @@ function App() {
       try {
         const data = await getWeatherData(city);
 
-        // merge max/min temps into current
         const currentWithDay = {
           ...data.current,
           maxtemp_c: data.forecast.forecastday[0].day.maxtemp_c,
@@ -52,29 +53,43 @@ function App() {
           location: data.location,
         });
       } catch (e) {
-        setError(e?.message || 'Failed to fetch weather data');
+        if (e.message.includes('City')) {
+          setError('City not found. Please check the spelling.');
+        } else {
+          setError('Network error. Please try again later.');
+        }
       } finally {
         setLoading(false);
       }
     };
 
     fetchWeather();
+    intervalId = setInterval(fetchWeather, 5 * 60 * 1000);
+
+    return () => clearInterval(intervalId);
   }, [city]);
 
   return (
-    <div className={`app ${GradientClass}`}>
+    <div className={`app ${gradientClass}`}>
       <div className="container">
         <SearchBar onSearch={setCity} />
 
+        <button
+          className="refresh-btn"
+          onClick={() => setCity((prev) => prev)}
+          disabled={loading}
+        >
+          🔄 Refresh
+        </button>
+
         {loading && <p>Loading...</p>}
-        {error && <p>{error}</p>}
+        {error && <div className="error-message">⚠️ {error}</div>}
 
         {weatherData && (
           <>
             <CurrentWeather
               data={weatherData.current}
               location={weatherData.location}
-              loading={loading}
             />
             <HourlyForecast data={weatherData.hourly} />
             <WeeklyForecast data={weatherData.weekly} />
