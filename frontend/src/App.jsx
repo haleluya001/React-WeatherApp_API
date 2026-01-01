@@ -7,10 +7,6 @@ import WeeklyForecast from './components/WeeklyForecast';
 import SearchBar from './components/SearchBar';
 import { parse } from 'date-fns';
 
-/**
- * getGradientClass: Determines the CSS background class based on the local time
- * of the city being searched to reflect sunrise, day, sunset, or night.
- */
 const getGradientClass = (hour) => {
   if (hour >= 6 && hour < 9) return 'bg-sunrise';
   if (hour >= 9 && hour < 17) return 'bg-day';
@@ -23,38 +19,25 @@ function App() {
   const [weatherData, setWeatherData] = useState(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  
-  // NEW: State for temperature unit ('C' or 'F')
   const [unit, setUnit] = useState('C');
-  
-  // NEW: State for search history
   const [history, setHistory] = useState([]);
 
-  // Calculate local hour for background gradients
   const hour = weatherData?.location?.localtime
     ? parse(weatherData.location.localtime, 'yyyy-MM-dd HH:mm', new Date()).getHours()
     : new Date().getHours();
 
   const gradientClass = getGradientClass(hour);
 
-  /**
-   * handleSearch: Triggered when a user selects a city. 
-   * Updates the city state and adds it to the recent history list.
-   */
   const handleSearch = (newCity) => {
     setCity(newCity);
     setHistory((prev) => {
       const filtered = prev.filter(item => item.toLowerCase() !== newCity.toLowerCase());
-      const updated = [newCity, ...filtered].slice(0, 5); // Keep last 5
+      const updated = [newCity, ...filtered].slice(0, 5);
       localStorage.setItem('recentSearches', JSON.stringify(updated));
       return updated;
     });
   };
 
-  /**
-   * handleGeolocation: Uses the Browser API to find user coordinates 
-   * and fetches weather based on "lat,lon".
-   */
   const handleGeolocation = () => {
     if (navigator.geolocation) {
       navigator.geolocation.getCurrentPosition((position) => {
@@ -66,16 +49,11 @@ function App() {
     }
   };
 
-  // Load history from LocalStorage on mount
   useEffect(() => {
     const saved = localStorage.getItem('recentSearches');
     if (saved) setHistory(JSON.parse(saved));
   }, []);
 
-  /**
-   * fetchWeather (inside useEffect): The core data fetching logic.
-   * Runs every time 'city' changes or every 5 minutes.
-   */
   useEffect(() => {
     let intervalId;
     const fetchWeather = async () => {
@@ -92,7 +70,7 @@ function App() {
             mintemp_f: data.forecast.forecastday[0].day.mintemp_f,
           },
           hourly: data.forecast.forecastday[0].hour,
-          weekly: data.forecast.forecastday.slice(1),
+          weekly: data.forecast.forecastday, // Changed to include today for a full week view
           location: data.location,
         });
       } catch (e) {
@@ -111,37 +89,47 @@ function App() {
     <div className={`app ${gradientClass}`}>
       <div className="container">
         
-        {/* Pass search handler and history to SearchBar */}
-        <SearchBar 
-          onSearch={handleSearch} 
-          onGeoClick={handleGeolocation} 
-          history={history} 
-        />
+        {/* Header Section: Search and Controls */}
+        <header className="app-header">
+          <SearchBar 
+            onSearch={handleSearch} 
+            onGeoClick={handleGeolocation} 
+            history={history} 
+          />
 
-        <div className="controls">
-          <button className="refresh-btn" onClick={() => setCity(city)} disabled={loading}>
-            🔄 Refresh
-          </button>
+          <div className="controls">
+            <button className="refresh-btn" onClick={() => setCity(city)} disabled={loading}>
+              {loading ? '...' : '🔄 Refresh'}
+            </button>
+            <button className="unit-toggle" onClick={() => setUnit(unit === 'C' ? 'F' : 'C')}>
+              °{unit === 'C' ? 'F' : 'C'}
+            </button>
+          </div>
+        </header>
 
-          {/* NEW: Toggle Button for C/F */}
-          <button className="unit-toggle" onClick={() => setUnit(unit === 'C' ? 'F' : 'C')}>
-            Switch to °{unit === 'C' ? 'F' : 'C'}
-          </button>
-        </div>
-
-        {loading && <p>Loading...</p>}
         {error && <div className="error-message">⚠️ {error}</div>}
 
         {weatherData && (
-          <>
-            <CurrentWeather 
-              data={weatherData.current} 
-              location={weatherData.location} 
-              unit={unit} 
-            />
-            <HourlyForecast data={weatherData.hourly} unit={unit} />
-            <WeeklyForecast data={weatherData.weekly} unit={unit} />
-          </>
+          <main className="weather-content">
+            {/* Top Section: Main Weather Stats */}
+            <section className="main-section">
+               <CurrentWeather 
+                data={weatherData.current} 
+                location={weatherData.location} 
+                unit={unit} 
+              />
+            </section>
+
+            {/* Middle Section: Hourly (Horizontal Scroll) */}
+            <section className="forecast-section">
+               <HourlyForecast data={weatherData.hourly} unit={unit} />
+            </section>
+
+            {/* Bottom Section: Weekly List */}
+            <section className="forecast-section">
+               <WeeklyForecast data={weatherData.weekly} unit={unit} />
+            </section>
+          </main>
         )}
       </div>
     </div>

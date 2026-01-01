@@ -102,7 +102,7 @@ form:focus-within {
     top: 110%;
     left: 0;
     right: 0;
-    background: rgba(15, 23, 42, 0.9);
+    background: rgba(15, 23, 42, 0.95);
     backdrop-filter: blur(20px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 16px;
@@ -123,7 +123,13 @@ form:focus-within {
 .history-item:hover { background: rgba(255, 255, 255, 0.1); color: #fff; }
 
 /* --- Controls --- */
-.controls { display: flex; gap: 12px; align-items: center; }
+.controls { 
+    display: flex; 
+    gap: 12px; 
+    align-items: center; 
+    flex-wrap: wrap; 
+}
+
 .refresh-btn, .unit-toggle {
     display: flex;
     align-items: center;
@@ -151,7 +157,6 @@ form:focus-within {
     transition: all 1s ease;
 }
 
-/* Specific gradients based on the parent background class */
 .bg-sunrise .temp {
     background-image: linear-gradient(to bottom, #ffffff, #ffd700);
     filter: drop-shadow(0 0 15px rgba(255, 215, 0, 0.4));
@@ -177,7 +182,7 @@ form:focus-within {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    flex-wrap: wrap;
+    flex-wrap: wrap; 
     gap: 2rem;
 }
 
@@ -202,18 +207,61 @@ form:focus-within {
 /* Hourly/Weekly generic styling */
 .hourly-container {
     display: flex;
-    overflow-x: auto;
+    overflow-x: auto; 
     gap: 1.25rem;
-    padding: 1.5rem;
+    padding: 1.5rem 0.5rem; /* Adjusted padding */
     background: rgba(255, 255, 255, 0.03);
     border-radius: 28px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; 
+}
+
+.hourly-container::-webkit-scrollbar {
+    display: none; 
 }
 
 .hour-card {
+    /* FIX: Added flex: 0 0 auto to prevent squashing */
+    flex: 0 0 auto; 
     min-width: 100px;
     padding: 1.5rem 1rem;
     text-align: center;
     background: rgba(255, 255, 255, 0.05);
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* ===== RESPONSIVE MEDIA QUERIES ===== */
+
+@media (max-width: 768px) {
+    .app { padding: 1rem; }
+    .container { gap: 1.5rem; }
+    .card { padding: 1.5rem; border-radius: 24px; }
+    .temp { font-size: 4rem; letter-spacing: -2px; }
+    .left-card { padding: 20px; min-width: 100%; }
+    .current-weather img { width: 100px; }
+    
+    /* FIX: Adjust Weekly Forecast grid for tablets */
+    .week-card {
+        grid-template-columns: 1fr auto 1fr;
+        gap: 10px;
+    }
+}
+
+@media (max-width: 480px) {
+    .temp { font-size: 3.5rem; }
+    .left-card { flex-direction: column; text-align: center; gap: 20px; }
+    .search-wrapper { max-width: 100%; }
+    .controls { justify-content: center; }
+    .refresh-btn, .unit-toggle { width: 100%; justify-content: center; }
+
+    /* FIX: Force Hourly cards to stay visible without shrinking */
+    .hour-card { min-width: 85px; padding: 1rem 0.5rem; }
+    
+    /* FIX: Weekly Forecast row adjustment for tiny screens */
+    .week-card {
+        padding: 1rem;
+        font-size: 0.9rem;
+    }
+    .week-day { width: 60px; } /* Prevent date from stretching */
 }

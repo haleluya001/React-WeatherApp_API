@@ -1,107 +1,68 @@
-/* --- Imports --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
-
-/* Main Container Appearance (Reference) */
-.weather-container {
-    font-family: 'Inter', sans-serif;
-    color: #ffffff;
-}
+/* CurrentWeather.css */
 
 .current-weather {
     display: flex;
-    align-items: center;
-    margin-bottom: 30px; /* Improved spacing */
-    gap: 40px;
-    padding: 10px 0;
-
-    .temp {
-        margin: 0;
-        font-size: 4.5rem;
-        font-weight: 700;
-        line-height: 1;
-        letter-spacing: -2px;
-        background: linear-gradient(180deg, #ffffff 0%, #cbd5e1 100%);
-        background-clip: text;
-        -webkit-background-clip: text;
-        -webkit-text-fill-color: transparent;
-        text-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-
-    img {
-        width: 100px;
-        height: auto;
-        filter: drop-shadow(0 0 12px rgba(255, 255, 255, 0.3));
-    }
-
-    p {
-        font-size: 1.1rem;
-        font-weight: 500;
-        margin: 0;
-        color: #e2e8f0;
-        letter-spacing: 0.5px;
-    }
+    width: 100%;
+    box-sizing: border-box;
 }
 
-.condition,
-.condition-icon {
+/* We target .left-card.card to override the heavy App.css padding */
+.left-card.card {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 2rem;
+    padding: 2.5rem; /* Standard desktop padding */
+    flex: 1;
+    width: auto;
+    box-sizing: border-box;
+    /* This ensures the card doesn't push off the screen */
+    max-width: 100%; 
+}
+
+.condition {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.condition img {
+    width: 100px;
+    height: auto;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.3));
 }
 
 .condition-text {
-    margin-top: 0;
-    font-size: 1.25rem;
+    margin-top: 0.5rem;
+    font-size: 1.2rem;
     font-weight: 500;
-    color: #94a3b8;
-    text-transform: capitalize;
 }
 
-.left-card {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 40px;
-    max-width: 450px;
-    padding: 24px;
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 20px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+/* --- RESPONSIVE ADJUSTMENTS --- */
+
+@media (max-width: 768px) {
+    .left-card.card {
+        padding: 1.5rem; /* Reduce padding for tablets */
+    }
 }
 
-.right-card {
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    background: rgba(15, 23, 42, 0.3);
-    padding: 24px;
-    border-radius: 20px;
-    backdrop-filter: blur(10px);
-}
+@media (max-width: 480px) {
+    .left-card.card {
+        flex-direction: column; /* Stack weather info and icon vertically */
+        text-align: center;
+        padding: 1.25rem; /* Tighten padding to show glass corners */
+        gap: 1.5rem;
+        /* Add margin to ensure the glass border is visible from screen edge */
+        margin: 0 4px; 
+    }
 
-.detail-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 1.25rem;
-    font-size: 1.1rem;
-    gap: 80px;
-    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-    padding-bottom: 8px;
-}
+    .temp {
+        font-size: 3.5rem !important; /* Force smaller text to prevent overflow */
+    }
 
-.detail-item:last-child {
-    margin-bottom: 0;
-    border-bottom: none;
-    padding-bottom: 0;
+    .condition img {
+        width: 80px;
+    }
 }
-
-.detail-label {
-    color: #94a3b8;
-    font-weight: 400;
-    display: flex;
-    align-items: center;
-}
-
-.detail-value {
-    font-weight: 600;
-    color: #f8fafc;
-}
+    .controls { flex-direction: column; gap: 10px; }
